@@ -1,0 +1,21 @@
+Source: pycangjie
+Section: python
+Priority: optional
+Maintainer: Anthony Wong <anthony.wong@ubuntu.com>
+Build-Depends: debhelper (>= 9),
+               autotools-dev,
+               python3-all-dev (>=3.2),
+               cython (>= 0.17),
+               pkg-config,
+               libcangjie-dev
+Standards-Version: 3.9.4
+Homepage: https://github.com/bochecha/pycangjie.git
+X-Python3-Version: >= 3.2
+
+Package: python3-pycangjie
+Architecture: any
+Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, libcangjie1
+Provides: ${python3:Provides}
+Description: Python wrapper to libcangjie
+ This is a python wrapper to libcangjie, a library that implements the
+ Chinese input method Cangjie (and also Quick).

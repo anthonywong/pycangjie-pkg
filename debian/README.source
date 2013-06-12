@@ -1,0 +1,5 @@
+pycangjie for Debian
+--------------------
+
+pycangjie only supports python >= 3.2 so no python2 module will be
+built.

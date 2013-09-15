@@ -10,6 +10,8 @@ Build-Depends: debhelper (>= 9),
                libcangjie-dev
 Standards-Version: 3.9.4
 Homepage: https://github.com/bochecha/pycangjie.git
+Vcs-Git: git://git.debian.org/git/pkg-ime/pycangjie.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-ime/pycangjie.git;a=summary
 X-Python3-Version: >= 3.2
 
 Package: python3-pycangjie

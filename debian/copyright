@@ -3,7 +3,8 @@ Upstream-Name: pycangjie
 Source: https://github.com/bochecha/pycangjie
 
 Files: *
-Copyright: 2012-2013 Mathieu Bridon <bochecha@fedoraproject.org>
+Copyright: 2012-2014 Mathieu Bridon <bochecha@fedoraproject.org>
+                     jeremy-fouriaux
 License: LGPL-3+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published
@@ -25,7 +26,7 @@ License: LGPL-3+
  `/usr/share/common-licenses/LGPL-3'.
 
 Files: debian/*
-Copyright: 2013 Anthony Wong <anthony.wong@ubuntu.com>
+Copyright: 2013-2014 Anthony Wong <anthony.wong@ubuntu.com>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

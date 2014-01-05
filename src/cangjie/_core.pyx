@@ -12,70 +12,50 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with pycangjie.  If not, see <http://www.gnu.org/licenses/>.
 
-from cython.operator cimport preincrement as inc, dereference as deref
 
 cimport _core
 
+from .errors import CangjieError, CangjieInvalidInputError, handle_error_code
 
-cdef class ChChar:
-    cdef _core.CppChChar* cobj
 
-    def __cinit__(self, string chchar, uint32_t type, uint32_t order):
-        # There seems to be a bug in Python, where it doesn't know some valid
-        # UTF-8 sequences (see the unit tests for an example of it).
-        # So let's try here first, so that we fail earlier rather than later,
-        # in weird ways which would be painful to debug.
-        chchar.decode("utf-8")
+cdef class CangjieChar:
+    cdef _core.CCangjieChar *cobj
 
-        self.cobj = new _core.CppChChar(chchar, type, order)
-        if self.cobj == NULL:
-            raise MemoryError('Not enough memory.')
+    def __cinit__(self, char *chchar, char *code, uint32_t frequency):
+        ret = <int>_core.cangjie_char_new(&self.cobj, chchar, code,
+                                          frequency)
 
-    def __dealloc__(self):
-        if self.cobj is not NULL:
-            del self.cobj
+        handle_error_code(ret, msg="An unknown error happened while "
+                                   "initializing a CangjieChar object (error "
+                                   "code %d)" % ret)
 
     @property
     def chchar(self):
-        return self.cobj.chchar().decode("utf-8")
-
-    def get_code(self):
-        return self.cobj.code().decode("utf-8")
-    def set_code(self, string code):
-        self.cobj.set_code(code)
-    code = property(get_code, set_code)
-
-    def get_frequency(self):
-        return self.cobj.frequency()
-    def set_frequency(self, uint32_t frequency):
-        self.cobj.set_frequency(frequency)
-    frequency = property(get_frequency, set_frequency)
-
-    def get_classic_frequency(self):
-        return self.cobj.classic_frequency()
-    def set_classic_frequency(self, uint32_t frequency):
-        self.cobj.set_classic_frequency(frequency)
-    classic_frequency = property(get_classic_frequency, set_classic_frequency)
+        return self.cobj.chchar.decode("utf-8")
 
     @property
-    def type(self):
-        return self.cobj.type()
+    def code(self):
+        return self.cobj.code.decode("utf-8")
+
+    @property
+    def frequency(self):
+        return self.cobj.frequency
+
+    def __dealloc__(self):
+        if self.cobj is not NULL:
+            _core.cangjie_char_free(self.cobj)
 
     def __str__(self):
-        return ("<ChChar code='%s', chchar='%s', frequency='%s',"
-                " classic_frequency='%s', type='%s'>"
-                % (self.code, self.chchar, self.frequency,
-                   self.classic_frequency, self.type))
+        return ("<CangjieChar chchar='%s', code='%s', frequency='%s'>"
+                % (self.chchar, self.code, self.frequency))
 
     def __richcmp__(self, other, op):
-        equality = (self.code == other.code
-                and self.chchar == other.chchar
-                and self.frequency == other.frequency
-                and self.classic_frequency == other.classic_frequency
-                and self.type == other.type)
+        equality = (self.chchar == other.chchar
+                and self.code == other.code
+                and self.frequency == other.frequency)
 
         if op == 2:
             return equality
@@ -86,69 +66,119 @@ cdef class ChChar:
         raise NotImplementedError("Only (in)equality is implemented")
 
 
-cdef class CangJie:
-    cdef _core.CppCangJie* cobj
+cdef class CangjieCharList:
+    cdef _core.CCangjieCharList *cobj
 
-    def __cinit__(self, _core.CangJie_Version_Type version, uint32_t flags):
-        """Constructor for the CangJie class
+    def __cinit__(self):
+        self.cobj = NULL
+
+    def __iter__(self):
+        cdef _core.CCangjieCharList *iter_ = self.cobj
+        if self.cobj == NULL:
+            raise StopIteration()
+
+        while True:
+            c = iter_.c
+            yield CangjieChar(c.chchar, c.code, c.frequency)
+
+            if iter_.next == NULL:
+                break
+
+            iter_ = iter_.next
+
+    def __dealloc__(self):
+        if self.cobj is not NULL:
+            _core.cangjie_char_list_free(self.cobj)
+
+
+cdef class Cangjie:
+    cdef _core.CCangjie *cobj
+
+    def __cinit__(self, _core.CangjieVersion version,
+                  _core.CangjieFilter filter_flags):
+        """Constructor for the Cangjie class
 
         The `version` parameter must be one of the available constants in
         the `cangjie.versions` module.
 
-        The `flags` parameter must be one of the available constants in
-        the `cangjie.languages` module.
+        The `filter_flags` parameter must be a bitwise-AND of one or more of
+        the available constants in the `cangjie.filters` module.
         """
-        self.cobj = new _core.CppCangJie(version, flags)
-        if self.cobj == NULL:
-            raise MemoryError('Not enough memory.')
+        ret = <int>_core.cangjie_new(&self.cobj, version, filter_flags)
+
+        handle_error_code(ret, msg="An unknown error happened while "
+                                   "initializing a Cangjie object (error code"
+                                   " %d)" % ret)
+
+    @property
+    def filter_flags(self):
+        return self.cobj.filter_flags
+
+    @property
+    def version(self):
+        return self.cobj.version
+
+    def get_characters(self, str code):
+        l = CangjieCharList()
+        b_code = code.encode("utf-8")
+
+        ret = <int>_core.cangjie_get_characters(self.cobj, b_code, &l.cobj)
+
+        handle_error_code(ret, msg="An unknown error happened while trying to"
+                                   " get the characters for code '%s' (error "
+                                   "code %d)" % (code, ret))
+
+        return list(l)
+
+    def get_characters_by_shortcode(self, str code):
+        l = CangjieCharList()
+        b_code = code.encode("utf-8")
+
+        ret = <int>_core.cangjie_get_characters_by_shortcode(self.cobj,
+                                                             b_code,
+                                                             &l.cobj)
+
+        handle_error_code(ret, msg="An unknown error happened while trying to"
+                                   " get the characters for short code '%s' "
+                                   "(error code %d)" % (code, ret))
+
+        return list(l)
+
+    def get_radical(self, str key):
+        b_key = key.encode("utf-8")
+        if len(b_key) > 1:
+            raise CangjieInvalidInputError()
+
+        # A char is in fact an integer in C
+        b_key = ord(b_key)
+
+        cdef char *radical
+
+        ret = <int>_core.cangjie_get_radical(self.cobj, b_key, &radical)
+
+        handle_error_code(ret, msg="An unknown error happened while trying to"
+                                   " get the radical for code '%s' (error "
+                                   "code %d)" % (key, ret))
+
+        return (<bytes>radical).decode("utf-8")
+
+    def is_input_key(self, str key):
+        b_key = key.encode("utf-8")
+        if len(b_key) > 1:
+            raise CangjieInvalidInputError()
+
+        # A char is in fact an integer in C
+        b_key = ord(b_key)
+
+        ret = <int>_core.cangjie_is_input_key(self.cobj, b_key)
+
+        if ret not in (_core.CANGJIE_OK, _core.CANGJIE_INVALID):
+            raise CangjieError("An unknown error happened while checking "
+                               "whether '%s' is a valid input code (error "
+                               "code %d)" % ret)
+
+        return ret == _core.CANGJIE_OK
 
     def __dealloc__(self):
         if self.cobj is not NULL:
-            del self.cobj
-
-    cdef __iterate_chars(self, vector[CppChChar] v):
-        cdef CppChChar *cppchchar_ptr
-        cdef vector[CppChChar].iterator iter = v.begin()
-        cdef vector[CppChChar].iterator end = v.end()
-
-        result = []
-
-        while iter < end:
-            cppchchar_ptr = &deref(iter)
-
-            try:
-                chchar = ChChar(cppchchar_ptr.chchar(), cppchchar_ptr.type(),
-                                cppchchar_ptr.order())
-                chchar.set_code(cppchchar_ptr.code())
-                chchar.set_frequency(cppchchar_ptr.frequency())
-                chchar.set_classic_frequency(cppchchar_ptr.classic_frequency())
-                result.append(chchar)
-
-            except UnicodeDecodeError:
-                # Python's UTF-8 codec doesn't like this chchar :(
-                pass
-
-            inc(iter)
-
-        return result
-
-    def getCharacters(self, str code):
-        """Return the CJK characters corresponding to the `code`"""
-        cdef string c_code = code.encode("utf-8")
-        cdef vector[CppChChar] v = self.cobj.getCharacters(c_code)
-        return self.__iterate_chars(v)
-
-    def isCangJieInputKey(self, str c):
-        """Return whether the input `c` is a valid CangJie char"""
-        cdef char c_c = ord(c.encode("utf-8"))
-        return self.cobj.isCangJieInputKey(c_c)
-
-    def translateInputKeyToCangJie(self, str c):
-        """Return the CangJie representation (radical) of an input char"""
-        cdef char c_c = ord(c.encode("utf-8"))
-        return self.cobj.translateInputKeyToCangJie(c_c).decode("utf-8")
-
-    def getFullWidthChar(self, str c):
-        """Return the full-width version of a character"""
-        cdef char c_c = ord(c.encode("utf-8"))
-        return self.cobj.getFullWidthChar(c_c).decode("utf-8")
+            _core.cangjie_free(self.cobj)

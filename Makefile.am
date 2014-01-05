@@ -9,44 +9,57 @@ cangjiedir = $(pkgpyexecdir)
 
 pkgpyexec_LTLIBRARIES = \
 	_core.la \
-	languages.la \
+	errors.la \
+	filters.la \
 	versions.la \
 	$(NULL)
 
+
 nodist__core_la_SOURCES = \
-	src/cangjie/_core.cpp \
+	src/cangjie/_core.c \
 	$(NULL)
-_core_la_CXXFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
+_core_la_CFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
 _core_la_LDFLAGS = -avoid-version -module
 _core_la_LIBADD = $(LIBCANGJIE_LIBS)
 
-nodist_languages_la_SOURCES = \
-	src/cangjie/languages.cpp \
+nodist_errors_la_SOURCES = \
+	src/cangjie/errors.c \
 	$(NULL)
-languages_la_CXXFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
-languages_la_LDFLAGS = -avoid-version -module
-languages_la_LIBADD = $(LIBCANGJIE_LIBS)
+errors_la_CFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
+errors_la_LDFLAGS = -avoid-version -module
+errors_la_LIBADD = $(LIBCANGJIE_LIBS)
+
+nodist_filters_la_SOURCES = \
+	src/cangjie/filters.c \
+	$(NULL)
+filters_la_CFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
+filters_la_LDFLAGS = -avoid-version -module
+filters_la_LIBADD = $(LIBCANGJIE_LIBS)
 
 nodist_versions_la_SOURCES = \
-	src/cangjie/versions.cpp \
+	src/cangjie/versions.c \
 	$(NULL)
-versions_la_CXXFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
+versions_la_CFLAGS = $(LIBCANGJIE_CFLAGS) $(PYTHON_INCLUDE)
 versions_la_LDFLAGS = -avoid-version -module
 versions_la_LIBADD = $(LIBCANGJIE_LIBS)
 
 pkgpyexecdir = $(pyexecdir)/cangjie
 
-src/cangjie/_core.cpp: src/cangjie/_core.pyx src/cangjie/_core.pxd
+src/cangjie/_core.c: src/cangjie/_core.pyx src/cangjie/_core.pxd
 	$(MKDIR_P) src/cangjie
-	$(CYTHON) --cplus -3 --verbose -o $@ $(srcdir)/src/cangjie/_core.pyx
+	$(CYTHON) -3 --verbose -o $@ $(srcdir)/src/cangjie/_core.pyx
 
-src/cangjie/languages.cpp: src/cangjie/languages.pyx src/cangjie/_core.pxd
+src/cangjie/errors.c: src/cangjie/errors.pyx src/cangjie/_core.pxd
 	$(MKDIR_P) src/cangjie
-	$(CYTHON) --cplus -3 --verbose -o $@ $(srcdir)/src/cangjie/languages.pyx
+	$(CYTHON) -3 --verbose -o $@ $(srcdir)/src/cangjie/errors.pyx
 
-src/cangjie/versions.cpp: src/cangjie/versions.pyx src/cangjie/_core.pxd
+src/cangjie/filters.c: src/cangjie/filters.pyx src/cangjie/_core.pxd
 	$(MKDIR_P) src/cangjie
-	$(CYTHON) --cplus -3 --verbose -o $@ $(srcdir)/src/cangjie/versions.pyx
+	$(CYTHON) -3 --verbose -o $@ $(srcdir)/src/cangjie/filters.pyx
+
+src/cangjie/versions.c: src/cangjie/versions.pyx src/cangjie/_core.pxd
+	$(MKDIR_P) src/cangjie
+	$(CYTHON) -3 --verbose -o $@ $(srcdir)/src/cangjie/versions.pyx
 
 # -- Testing -------------------------
 TESTS = tests/run_tests
@@ -71,17 +84,17 @@ AUTHORS:
 	fi
 
 CLEANFILES = \
-	src/cangjie/_core.cpp \
-	src/cangjie/languages.cpp \
-	src/cangjie/versions.cpp \
+	src/cangjie/*.c \
 	tests/run_tests \
 	$(NULL)
 
 EXTRA_DIST = \
 	autogen.sh \
+	README.md \
 	src/cangjie/_core.pyx \
 	src/cangjie/_core.pxd \
-	src/cangjie/languages.pyx \
+	src/cangjie/errors.pyx \
+	src/cangjie/filters.pyx \
 	src/cangjie/versions.pyx \
 	tests/run_tests.in \
 	tests/__init__.py \

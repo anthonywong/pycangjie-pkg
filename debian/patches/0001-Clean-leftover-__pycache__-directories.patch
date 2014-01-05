@@ -1,0 +1,12 @@
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -88,6 +88,9 @@
+ 	tests/run_tests \
+ 	$(NULL)
+ 
++clean-local:
++	-rm -rf tests/__pycache__
++
+ EXTRA_DIST = \
+ 	autogen.sh \
+ 	README.md \

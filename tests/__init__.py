@@ -12,7 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with pycangjie.  If not, see <http://www.gnu.org/licenses/>.
 
 
@@ -42,7 +42,7 @@ class MetaTest(type):
     def __init__(cls, name, bases, dct):
         super(MetaTest, cls).__init__(name, bases, dct)
 
-        def gen_codes(repeat):
+        def gen_codes():
             """Generate the 702 possible input codes"""
             # First, the 1-character codes
             for c in string.ascii_lowercase:
@@ -58,7 +58,7 @@ class MetaTest(type):
             return func
 
         # Generate the test_* methods
-        for code in gen_codes(dct["code_len"]):
+        for code in gen_codes():
             setattr(cls, "test_%s" % code.replace("*", ""), tester(code))
 
 
@@ -67,7 +67,7 @@ class BaseTestCase:
     cli_cmd = ["/usr/bin/libcangjie_cli"]
 
     def setUp(self):
-        self.cj = cangjie.CangJie(self.version, self.language)
+        self.cj = cangjie.Cangjie(self.version, self.language)
 
     def tearDown(self):
         del self.cj
@@ -78,12 +78,14 @@ class BaseTestCase:
                                 stderr=subprocess.PIPE)
         out, err = proc.communicate()
 
-        if proc.returncode:
-            msg = (err if err
-                       else "Unknown error while executing '%s'"
-                            % ' '.join(cmd))
-            raise subprocess.CalledProcessError(proc.returncode, cmd,
-                                                output=msg)
+        try:
+            cangjie.errors.handle_error_code(proc.returncode,
+                                             msg="Unknown error while running"
+                                                 " libcangjie_cli (%d)"
+                                                 % proc.returncode)
+
+        except cangjie.errors.CangjieNoCharsError:
+            return ""
 
         try:
             return out.decode("utf-8")
@@ -119,31 +121,31 @@ class BaseTestCase:
         Note that this whole test is based on scraping the output of
         libcangjie_cli, which is quite fragile.
         """
-        # Get a list of ChChar from libcangjie_cli as a reference
+        # Get a list of CangjieChar from libcangjie_cli as a reference
         tmp_expected = self.run_command(self.cli_cmd+[input_code]).split("\n")
-        tmp_expected = [item for item in tmp_expected
-                             if item and not item.startswith("TOTAL:")]
+        tmp_expected = map(lambda x: x.strip(" \n"), tmp_expected)
+        tmp_expected = filter(lambda x: len(x) > 0, tmp_expected)
 
         expected = []
-
         for item in tmp_expected:
-            # The CLI tool prints a space at the end of every line
-            item = item.strip(" ")
+            chchar, code, frequency = item.split(", ")
 
-            (chchar, code, order, freq, classic_freq, type_) = item.split(" ")
-            c = cangjie._core.ChChar(chchar.encode("utf-8"), int(type_), int(order))
-            c.set_code(code.encode("utf-8"))
-            c.set_frequency(int(freq))
-            c.set_classic_frequency(int(classic_freq))
-            expected.append(c)
+            chchar = chchar.split(" ")[-1]
+            code = code.split(" ")[-1].strip("'")
+            frequency = int(frequency.split(" ")[-1])
+
+            expected.append(cangjie._core.CangjieChar(chchar.encode("utf-8"),
+                                                      code.encode("utf-8"),
+                                                      frequency))
 
         expected = sorted(expected, key=operator.attrgetter('chchar', 'code'))
 
-        # And compare with what pycangjie produces
-        results = sorted(self.cj.getCharacters(input_code),
-                         key=operator.attrgetter('chchar', 'code'))
+        try:
+            # And compare with what pycangjie produces
+            results = sorted(self.cj.get_characters(input_code),
+                             key=operator.attrgetter('chchar', 'code'))
 
-        self.assertEqual(results, expected,
-                         "Expected:\n%s\nGot:\n%s"
-                         % ('\n'.join([str(e) for e in expected]),
-                            '\n'.join([str(r) for r in results])))
+            self.assertEqual(results, expected)
+
+        except cangjie.errors.CangjieNoCharsError:
+            self.assertEqual(len(expected), 0)

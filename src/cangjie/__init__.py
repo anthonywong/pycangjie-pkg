@@ -12,7 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with pycangjie.  If not, see <http://www.gnu.org/licenses/>.
 
 # The stuff in core should be exposed directly here, but it seems to be
@@ -20,5 +20,5 @@
 from ._core import *
 
 # Native extentions don't get exposed automatically
-from . import languages
+from . import filters
 from . import versions

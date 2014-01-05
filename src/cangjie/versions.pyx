@@ -12,12 +12,12 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with pycangjie.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport _core
 
 
 # Make the version constants available in the Python module
-CANGJIE3 = _core.CangJie_Version_Type_3
-CANGJIE5 = _core.CangJie_Version_Type_5
+CANGJIE3 = _core.CANGJIE_VERSION_3
+CANGJIE5 = _core.CANGJIE_VERSION_5

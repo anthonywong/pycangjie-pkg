@@ -1,5 +1,5 @@
 AC_PREREQ(2.63)
-AC_INIT([pycangjie], [0.0.1], [https://github.com/bochecha/pycangjie/issues], [cangjie], [https://github.com/bochecha/pycangjie])
+AC_INIT([pycangjie], [1.0], [https://github.com/Cangjians/pycangjie/issues], [cangjie], [https://github.com/Cangjians/pycangjie])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -9,17 +9,11 @@ AC_PROG_MKDIR_P
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
-# Needed to build C++ and check for deps
-AC_PROG_CXX
-AC_LANG_PUSH([C++])
-
 # Initialize libtool
 LT_INIT([disable-static])
 
 # Check for libcangjie
-PKG_CHECK_MODULES(LIBCANGJIE, [cangjie >= 0.0.1])
-
-AC_LANG_POP([C++])
+PKG_CHECK_MODULES(LIBCANGJIE, [cangjie >= 1.0])
 
 # Check for Python 3
 AM_PATH_PYTHON([3.2.3])
@@ -40,7 +34,7 @@ AC_PATH_PROGS([CYTHON],
 AS_IF([test "$CYTHON" = no], [AC_MSG_ERROR([cannot find cython.])])
 
 # Check for Cython version
-CYTHON_MIN_VERSION=0.17
+CYTHON_MIN_VERSION=0.14
 AC_MSG_CHECKING(for cython version)
 CYTHON_VERSION=`$CYTHON --version 2>&1 | cut -d" " -f3`
 AC_MSG_RESULT($CYTHON_VERSION)

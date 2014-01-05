@@ -12,14 +12,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU Lesser General Public License
 # along with pycangjie.  If not, see <http://www.gnu.org/licenses/>.
 
 cimport _core
 
 
 # Make the filter flags available in the Python module
-SIMPLIFIED = _core.CANGJIE_SIMPLIFIED
-TRADITIONAL = _core.CANGJIE_TRADITIONAL
-COMMON = _core.CANGJIE_COMMON
-ALL_CJK = _core.CANGJIE_ALL_CJK
+BIG5 = _core.CANGJIE_FILTER_BIG5
+HKSCS = _core.CANGJIE_FILTER_HKSCS
+PUNCTUATION = _core.CANGJIE_FILTER_PUNCTUATION
+CHINESE = _core.CANGJIE_FILTER_CHINESE
+ZHUYIN = _core.CANGJIE_FILTER_ZHUYIN
+KANJI = _core.CANGJIE_FILTER_KANJI
+KATAKANA = _core.CANGJIE_FILTER_KATAKANA
+HIRAGANA = _core.CANGJIE_FILTER_HIRAGANA
+SYMBOLS = _core.CANGJIE_FILTER_SYMBOLS

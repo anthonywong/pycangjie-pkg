@@ -6,20 +6,22 @@ Uploaders: Anthony Wong <anthony.wong@ubuntu.com>
 Build-Depends: debhelper (>= 9),
                autotools-dev,
                python3-all-dev (>=3.2),
-               cython (>= 0.17),
+               cython3,
                pkg-config,
-               libcangjie-dev,
+               libcangjie2-dev,
+               libcangjie2-dev-tools,
                libtool,
-               automake
-Standards-Version: 3.9.4
-Homepage: https://github.com/bochecha/pycangjie.git
+               automake,
+               dh-autoreconf
+Standards-Version: 3.9.5
+Homepage: https://github.com/Cangjians/pycangjie
 Vcs-Git: git://git.debian.org/git/pkg-ime/pycangjie.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-ime/pycangjie.git;a=summary
 X-Python3-Version: >= 3.2
 
 Package: python3-pycangjie
 Architecture: any
-Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, libcangjie1
+Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, libcangjie2
 Provides: ${python3:Provides}
 Description: Python wrapper to libcangjie
  This is a python wrapper to libcangjie, a library that implements the

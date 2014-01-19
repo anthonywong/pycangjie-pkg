@@ -1,3 +1,8 @@
+Author: Anthony Wong <anthony.wong@ubuntu.com>
+Description: Clean leftover tests/__pycache__ directory
+ The tests/__pycache__ directory has to be cleaned so that the build
+ can be done twice. Patch already submitted and accepted by upstream.
+
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -88,6 +88,9 @@

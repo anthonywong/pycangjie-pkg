@@ -88,9 +88,13 @@ CLEANFILES = \
 	tests/run_tests \
 	$(NULL)
 
+clean-local:
+	-rm -rf tests/__pycache__
+
 EXTRA_DIST = \
 	autogen.sh \
 	README.md \
+	$(wildcard docs/*.md) \
 	src/cangjie/_core.pyx \
 	src/cangjie/_core.pxd \
 	src/cangjie/errors.pyx \

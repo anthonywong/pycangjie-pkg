@@ -14,11 +14,13 @@ for c in cj.get_characters("a*y"):
 ```
 
 For more details, refer to the documentation, either
-[online](http://cangjians.github.io/projects/pycangjie/documentation.html)
+[online](http://cangjians.github.io/projects/pycangjie/documentation)
 or the one shipped with this software.
 
 Development happens [on github](https://github.com/Cangjians/pycangjie), and
-stable release tarballs will be available when we reach that point.
+stable release tarballs can be found in
+[the download section](http://cangjians.github.io/downloads/pycangjie/) of
+our website.
 
 ## Legalities
 

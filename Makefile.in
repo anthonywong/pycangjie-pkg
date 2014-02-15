@@ -604,6 +604,7 @@ CLEANFILES = \
 EXTRA_DIST = \
 	autogen.sh \
 	README.md \
+	$(wildcard docs/*.md) \
 	src/cangjie/_core.pyx \
 	src/cangjie/_core.pxd \
 	src/cangjie/errors.pyx \
@@ -1254,8 +1255,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-pkgpyexecLTLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local \
+	clean-pkgpyexecLTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -1330,9 +1331,9 @@ uninstall-am: uninstall-cangjiePYTHON uninstall-pkgpyexecLTLIBRARIES
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--refresh check check-TESTS \
 	check-am clean clean-cscope clean-generic clean-libtool \
-	clean-pkgpyexecLTLIBRARIES cscope cscopelist-am ctags ctags-am \
-	dist dist-all dist-bzip2 dist-gzip dist-lzip dist-shar \
-	dist-tarZ dist-xz dist-zip distcheck distclean \
+	clean-local clean-pkgpyexecLTLIBRARIES cscope cscopelist-am \
+	ctags ctags-am dist dist-all dist-bzip2 dist-gzip dist-lzip \
+	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
 	distclean-compile distclean-generic distclean-hdr \
 	distclean-libtool distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
@@ -1383,6 +1384,9 @@ AUTHORS:
 	          | sort | uniq ) > $@.tmp && mv -f $@.tmp $@ \
 	    || ( rm -f $@.tmp ; echo Failed to generate $@ >&2 ); \
 	fi
+
+clean-local:
+	-rm -rf tests/__pycache__
 
 .PHONY: AUTHORS
 

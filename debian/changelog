@@ -1,3 +1,9 @@
+pycangjie (1.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Anthony Wong <yp@anthonywong.net>  Sun, 26 Oct 2014 16:46:43 +0800
+
 pycangjie (1.1-1) unstable; urgency=low
 
   * New upstream release.

@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 9),
                python3-dev (>=3.2),
                cython3,
                pkg-config,
-               libcangjie2-dev,
+               libcangjie2-dev (>=1.2),
                libcangjie2-dev-tools,
                libtool,
                automake,
@@ -21,7 +21,7 @@ X-Python3-Version: >= 3.2
 
 Package: python3-pycangjie
 Architecture: any
-Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, libcangjie2
+Depends: ${python3:Depends}, ${shlibs:Depends}, ${misc:Depends}, libcangjie2 (>=1.2)
 Provides: ${python3:Provides}
 Description: Python wrapper to libcangjie
  This is a Python wrapper to libcangjie, a library that implements the

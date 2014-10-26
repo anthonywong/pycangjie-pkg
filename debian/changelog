@@ -1,8 +1,19 @@
 pycangjie (1.2-1) unstable; urgency=medium
 
   * New upstream release.
+  * Merge changes from last NMU, thanks Matthias for the fix.
+    (Closes: #743284)
 
  -- Anthony Wong <yp@anthonywong.net>  Sun, 26 Oct 2014 16:46:43 +0800
+
+pycangjie (1.1-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix cython version check. Closes: #743112, #742690.
+  * Drop build dependency on python3-all-dev, the package only builds
+    for the default python3 version. Closes: #734339.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 01 Apr 2014 11:13:50 +0100
 
 pycangjie (1.1-1) unstable; urgency=low
 
